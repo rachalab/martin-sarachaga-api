@@ -1,0 +1,33 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /sarachaga-optimized/public/
+
+    # Evita reescribir archivos o carpetas reales
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # -----------------------------
+    # Caso especial: Últimas subastas
+    # -----------------------------
+    RewriteRule ^auctions/last/?$ auctions.php?action=lastAuctions [L,QSA]
+
+    # -----------------------------
+    # Caso sin ID -> auctions.php sin parámetros
+    # -----------------------------
+    RewriteRule ^auctions/?$ auctions.php [L,QSA]
+
+    # -----------------------------
+    # Caso con ID + filtros opcionales
+    # -----------------------------
+    RewriteRule ^auctions/([0-9]+)(?:/(.*))?$ auctions.php?id=$1&params=$2 [L,QSA]
+
+    # -----------------------------
+    # Caso con ID -> category.php
+    # -----------------------------
+    RewriteRule ^category/([0-9]+)?$ category.php?id=$1 [L,QSA]
+
+    # -----------------------------
+    # Caso con ID -> batch.php
+    # -----------------------------
+    RewriteRule ^batch/([0-9]+)?$ batch.php?id=$1 [L,QSA]
+</IfModule>
