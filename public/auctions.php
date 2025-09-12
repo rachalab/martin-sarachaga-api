@@ -6,6 +6,17 @@ require_once '../src/BatchService.php'; // Include the BatchService class
 
 header('Content-Type: application/json');
 
+function utf8ize($mixed) {
+    if (is_array($mixed)) {
+        return array_map('utf8ize', $mixed);
+    } elseif (is_string($mixed)) {
+        return mb_convert_encoding($mixed, 'UTF-8', 'UTF-8');
+    }
+    return $mixed;
+}
+
+
+
 //Verificamos si se pide la ultima Subasta
 $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : false;
 
@@ -13,8 +24,8 @@ $auctionService = new AuctionService();
 
 if($action == "lastAuctions"){
     $subasta["subasta"] = $auctionService->getLastAuctionId();
-    
-    echo json_encode($subasta, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    $data = utf8ize($subasta);
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
 
@@ -60,6 +71,7 @@ $subasta["categorias"] = $CategoryService->getCategoryByAuctionId($subastId);
 $BatchService = new BatchService();
 $subasta["autores"] = $BatchService->getAuthorsByAuctionId($subastId); 
 $subasta["lotes"] = $BatchService->getBatchesByAuctionId($subastId, $autor, $categoria, $noche);
-
-echo json_encode($subasta, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+$data = utf8ize($subasta);
+echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    
 ?>
