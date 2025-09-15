@@ -35,10 +35,10 @@ class CategoryService {
      */
     public function getCategoryByAuctionId($id) {
         $conn = $this->db->getConnection();
-        $stmt = $conn->prepare("SELECT categorias.id, categorias.nombre FROM lotes 
-              JOIN categorias ON lotes.categoria = categorias.id 
-              WHERE lotes.subasta = ?
-              GROUP BY categorias.nombre");
+        $stmt = $conn->prepare("SELECT DISTINCT categorias.id, categorias.nombre
+FROM lotes
+JOIN categorias ON lotes.categoria = categorias.id
+WHERE lotes.subasta = ?");
 
 
         $stmt->bind_param("i", $id);

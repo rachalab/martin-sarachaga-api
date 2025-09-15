@@ -1,4 +1,13 @@
 <?php
+
+/*
+// Activa la visualización en pantalla
+ini_set('display_errors', 1);
+
+// Opcional: fuerza que también se muestren los errores de inicio
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+*/
 require_once '../src/AuctionService.php'; // Include the AuctionService class
 require_once '../src/NightService.php'; // Include the NightService class
 require_once '../src/CategoryService.php'; // Include the CategoryService class
@@ -13,7 +22,6 @@ $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : false;
 
 $auctionService = new AuctionService();
 $subasta["subasta"] = $auctionService->getCurrentAuction($id);
-
 $subastId = !empty($subasta["subasta"]["id"]) ? $subasta["subasta"]["id"] : false;
 
 //Si no existe el ID devolvemos un mensaje de error
@@ -28,6 +36,8 @@ $subasta["noches"] = $NightService->getNights($subastId);
 $CategoryService = new CategoryService();
 $Category = $CategoryService->getCategoryByAuctionId($subastId);
 
+
+
 //Si tiene categorias
 if(!empty($Category)){
     $BatchService = new BatchService();
@@ -36,5 +46,24 @@ if(!empty($Category)){
     $subasta["categorias"] = null;
 }
 
-echo json_encode($subasta, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+
+function utf8ize($mixed) {
+    if (is_array($mixed)) {
+        return array_map('utf8ize', $mixed);
+    } elseif (is_string($mixed)) {
+        return mb_convert_encoding($mixed, 'UTF-8', 'UTF-8');
+    }
+    return $mixed;
+}
+
+$data = utf8ize($subasta);
+
+$json= json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+if ($json === false) {
+    echo "Error en json_encode: " . json_last_error_msg();
+}else{
+    print $json;
+}
+
 ?>
