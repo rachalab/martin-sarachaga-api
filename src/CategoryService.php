@@ -1,12 +1,15 @@
 <?php
 require_once 'Database.php';
 require_once 'models/Category.php'; // Include the Category model
+require_once 'helpers/SlugHelper.php'; // Include any helper functions if needed
 
 class CategoryService {
     private $db;
+    private $slugHelper;    
 
     public function __construct() {
         $this->db = new Database();
+        $this->slugHelper = new SlugHelper(); // Assuming you have a SlugHelper class for Slug String        
     }
 
     /**
@@ -24,6 +27,9 @@ class CategoryService {
         
         $categories = $result->fetch_assoc();
         $stmt->close();
+
+
+        $categories["url"] = "/". $this->slugHelper->slugify($categories["nombre"]); 
 
         return $categories ?: null;
     }
@@ -48,7 +54,13 @@ class CategoryService {
         $categories = [];
         while ($data = $result->fetch_assoc()) {
             $category = new Category($data);
-            $categories[] = $category->toArray();
+
+            $categori = [];
+            $categori = $category->toArray();
+
+            $categori["url"] = "/". $this->slugHelper->slugify($categori["nombre"]); 
+
+            $categories[] = $categori;
         }
         $stmt->close();
         return $categories ?: null;

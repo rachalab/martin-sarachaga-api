@@ -31,7 +31,7 @@ class SlugHelper
     public function findOriginalBySlug($slug, $autores)
     {
         foreach ($autores as $autor) {
-            if (strcasecmp($autor['slug'], $slug) === 0) {
+            if (strcasecmp($autor['url'], $slug) === 0) {
                 return $autor['original'];
             }
         }

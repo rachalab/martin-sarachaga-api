@@ -5,11 +5,11 @@ require_once 'helpers/DateHelper.php'; // Include any helper functions if needed
 
 class AuctionService {
     private $db;
-    private $dateHelper;
+    private $dateHelper;    
 
     public function __construct() {
         $this->db = new Database();
-        $this->dateHelper = new DateHelper(); // Assuming you have a DateHelper class for date formatting
+        $this->dateHelper = new DateHelper(); // Assuming you have a DateHelper class for date formatting         
     }
 
     /**
@@ -76,10 +76,11 @@ class AuctionService {
             $array["fechacarga"] = $this->dateHelper->formatearFechaEspanol($auction->fechacarga);
         }
 
+
+        $array["url"] = "/subasta-presencial/". $array["id"];
+
         return $array ?: null;
     }
-
-
 
     /**
      * Trae la subasta la ultima subasta activa
@@ -121,6 +122,9 @@ class AuctionService {
         // Crea el objeto Auction
         $auction = new Auction($data);
         $auctions = $auction->toArray();
+
+        $auctions["url"] = "/subasta-presencial/". $auctions["id"];
+
 
         return $auctions ?: null;
     }
