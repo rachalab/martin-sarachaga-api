@@ -34,7 +34,10 @@ class BatchService {
         $batch = new Batch($data);
         $batchs = $batch->toArray();
 
-        $batchs['slug'] = $this->slugHelper->slugify($batchs["titulo"]);
+        $url = "/subasta-presencial/". $batchs["subasta"] ."/obras/";
+
+        $batchs['url'] = $url . $batchs["id"] . "-" .$this->slugHelper->slugify($batchs["titulo"]);
+
 
         // Convierte el objeto a array
         return $batchs ?: null;
@@ -79,7 +82,14 @@ class BatchService {
         $batches = [];
         while ($data = $result->fetch_assoc()) {
             $batch = new Batch($data);
-            $batches[] = $batch->toArray();
+
+            $batch_set = $batch->toArray();
+
+            $url = "/subasta-presencial/". $batch_set["subasta"] ."/obras/";
+
+            $batch_set['url'] = $url . $batch_set["id"] ."-".$this->slugHelper->slugify($batch_set["titulo"]);
+
+            $batches[] = $batch_set;
         }
 
         $stmt->close();
@@ -103,7 +113,7 @@ class BatchService {
 
             $autores[] = [
                 "original" => $autor,
-                "slug" => $this->slugHelper->slugify($autor)
+                "url" => "/" . $this->slugHelper->slugify($autor)
             ];
         }
 
@@ -136,6 +146,7 @@ class BatchService {
             $resultados[] = [
                 "id" => $categoria["id"],
                 "nombre" => $categoria["nombre"],
+                "url" => $categoria["url"],
                 "images" => $images
             ];
         }
