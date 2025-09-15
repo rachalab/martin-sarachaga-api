@@ -36,7 +36,9 @@ class BatchService {
 
         $url = "/subasta-presencial/". $batchs["subasta"] ."/obras/";
 
-        $batchs['url'] = $url . $batchs["id"] . "-" .$this->slugHelper->slugify($batchs["titulo"]);
+        $batchs['slug'] = $batchs["id"] . "-" .$this->slugHelper->slugify($batchs["titulo"]);
+        
+        $batchs['url'] = $url . $batchs['slug'];
 
 
         // Convierte el objeto a array
