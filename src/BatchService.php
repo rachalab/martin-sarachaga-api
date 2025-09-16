@@ -42,8 +42,11 @@ class BatchService {
         $batchs['slug'] = $batchs["id"] . "-" .$this->slugHelper->slugify($batchs["titulo"]);
         $batchs['url'] = $url . $batchs['slug'];
 
-
+        //Autores
         $batchs['autor'] = $this->formatAutorHelper->formatAutor($batchs["autor"]);
+
+        //Imagen
+        $batchs['image'] = "https://martinsarachaga.com/imagenes_lotes/" . $batchs['id'] . "_1_grande.jpg";
 
         // Convierte el objeto a array
         return $batchs ?: null;
@@ -94,9 +97,12 @@ class BatchService {
             $url = "/subasta-presencial/". $batch_set["subasta"] ."/obras/";
             $batch_set['url'] = $url . $batch_set["id"] ."-".$this->slugHelper->slugify($batch_set["titulo"]);
 
-
+            //Autores
             $batch_set['autor'] = $this->formatAutorHelper->formatAutor($batch_set["autor"]);
 
+
+            //Imagen
+            $batch_set['image'] = "https://martinsarachaga.com/imagenes_lotes/" . $batch_set['id'] . "_1_grande.jpg";
 
             $batches[] = $batch_set;
         }
