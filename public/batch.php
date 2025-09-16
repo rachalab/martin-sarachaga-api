@@ -24,6 +24,9 @@ $lote["lote"] = $batchService->getBatchById($id);
 
 //Si no existe el ID devolvemos un mensaje de error
 if (empty($lote["lote"]["id"])) {
+    header("HTTP/1.1 404 Not Found");
+    header("Status: 404 Not Found");
+
     echo json_encode(['error' => 'Lote no encontrada'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
@@ -31,6 +34,9 @@ if (empty($lote["lote"]["id"])) {
 $subastaId = !empty($lote["lote"]["subasta"]) ? $lote["lote"]["subasta"] : false;
 
 if (!$subastaId) {
+    header("HTTP/1.1 404 Not Found");
+    header("Status: 404 Not Found");
+
     echo json_encode(['error' => 'Subasta no encontrada'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
