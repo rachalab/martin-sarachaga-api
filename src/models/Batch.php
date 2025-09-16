@@ -17,7 +17,7 @@ class Batch
     public ?int $subasta;
     public ?string $moneda;
     public ?int $categoria;
-    public ?string $autor;
+    public ?string $autor = "Anonimo";
     public ?string $escuela;
     public ?string $tecnica;
     public ?int $home;
