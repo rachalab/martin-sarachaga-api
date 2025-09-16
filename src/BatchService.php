@@ -2,14 +2,17 @@
 require_once 'Database.php'; // Assuming Database.php is in the same directory
 require_once 'models/Batch.php'; // Include the Batch model
 require_once 'helpers/SlugHelper.php'; // Include any helper functions if needed
+require_once 'helpers/FormatAutorHelper.php';
 
 class BatchService {
     private $db;
     private $slugHelper;
+    private $formatAutorHelper;
 
     public function __construct() {
         $this->db = new Database();
-        $this->slugHelper = new SlugHelper(); // Assuming you have a SlugHelper class for Slug String
+        $this->slugHelper = new SlugHelper();
+        $this->formatAutorHelper = new FormatAutorHelper();
     }
 
     /**
@@ -34,10 +37,16 @@ class BatchService {
         $batch = new Batch($data);
         $batchs = $batch->toArray();
 
+        //Slug y url
         $url = "/subasta-presencial/". $batchs["subasta"] ."/obras/";
+        $batchs['slug'] = $batchs["id"] . "-" .$this->slugHelper->slugify($batchs["titulo"]);
+        $batchs['url'] = $url . $batchs['slug'];
 
-        $batchs['url'] = $url . $batchs["id"] . "-" .$this->slugHelper->slugify($batchs["titulo"]);
+        //Autores
+        $batchs['autor'] = $this->formatAutorHelper->formatAutor($batchs["autor"]);
 
+        //Imagen
+        $batchs['image'] = "https://martinsarachaga.com/imagenes_lotes/" . $batchs['id'] . "_1_grande.jpg";
 
         // Convierte el objeto a array
         return $batchs ?: null;
@@ -83,11 +92,17 @@ class BatchService {
         while ($data = $result->fetch_assoc()) {
             $batch = new Batch($data);
 
+            //Slug y url
             $batch_set = $batch->toArray();
-
             $url = "/subasta-presencial/". $batch_set["subasta"] ."/obras/";
-
             $batch_set['url'] = $url . $batch_set["id"] ."-".$this->slugHelper->slugify($batch_set["titulo"]);
+
+            //Autores
+            $batch_set['autor'] = $this->formatAutorHelper->formatAutor($batch_set["autor"]);
+
+
+            //Imagen
+            $batch_set['image'] = "https://martinsarachaga.com/imagenes_lotes/" . $batch_set['id'] . "_1_grande.jpg";
 
             $batches[] = $batch_set;
         }
@@ -108,9 +123,7 @@ class BatchService {
 
         $autores = [];
         while ($row = $result->fetch_assoc()) {
-            $autor = trim($row['autor']);
-            $autor = ($autor === "") ? "Anónimo" : $autor;
-
+            $autor = $this->formatAutorHelper->formatAutor($row['autor']);
             $autores[] = [
                 "original" => $autor,
                 "url" => "/" . $this->slugHelper->slugify($autor)
