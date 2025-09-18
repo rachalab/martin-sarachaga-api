@@ -26,6 +26,9 @@ $subastId = !empty($subasta["subasta"]["id"]) ? $subasta["subasta"]["id"] : fals
 
 //Si no existe el ID devolvemos un mensaje de error
 if (!$subastId) {
+    header("HTTP/1.1 404 Not Found");
+    header("Status: 404 Not Found");
+
     echo json_encode(['error' => 'Subasta no encontrada'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
@@ -46,8 +49,6 @@ if(!empty($Category)){
     $subasta["categorias"] = null;
 }
 
-
-
 function utf8ize($mixed) {
     if (is_array($mixed)) {
         return array_map('utf8ize', $mixed);
@@ -58,12 +59,6 @@ function utf8ize($mixed) {
 }
 
 $data = utf8ize($subasta);
-
-$json= json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-if ($json === false) {
-    echo "Error en json_encode: " . json_last_error_msg();
-}else{
-    print $json;
-}
+echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
 ?>

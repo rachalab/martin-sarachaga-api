@@ -1,5 +1,5 @@
 <?php
-class formatAutorHelper
+class FormatStringHelper
 {
     public function formatAutor(?string $autor): string {
         // Si es null o cadena vacía o solo espacios

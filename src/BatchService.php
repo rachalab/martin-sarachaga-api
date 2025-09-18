@@ -2,17 +2,20 @@
 require_once 'Database.php'; // Assuming Database.php is in the same directory
 require_once 'models/Batch.php'; // Include the Batch model
 require_once 'helpers/SlugHelper.php'; // Include any helper functions if needed
-require_once 'helpers/FormatAutorHelper.php';
+require_once 'helpers/FormatStringHelper.php';
+require_once 'helpers/FormatImageHelper.php';
 
 class BatchService {
     private $db;
     private $slugHelper;
-    private $formatAutorHelper;
+    private $formatStringHelper;
+    private $formatImageHelper;
 
     public function __construct() {
         $this->db = new Database();
         $this->slugHelper = new SlugHelper();
-        $this->formatAutorHelper = new FormatAutorHelper();
+        $this->formatStringHelper = new FormatStringHelper();
+        $this->formatImageHelper = new FormatImageHelper();
     }
 
     /**
@@ -43,11 +46,11 @@ class BatchService {
         $batchs['url'] = $url . $batchs['slug'];
 
         //Autores
-        $batchs['autor'] = $this->formatAutorHelper->formatAutor($batchs["autor"]);
+        $batchs['autor'] = $this->formatStringHelper->formatAutor($batchs["autor"]);
 
-        //Imagen
-        $batchs['image'] = "https://martinsarachaga.com/imagenes_lotes/" . $batchs['id'] . "_1_grande.jpg";
-
+        //Array para guardar las imágenes
+        $batchs['images'] = $this->formatImageHelper->ArrayformatImage($batchs["id"]);
+ 
         // Convierte el objeto a array
         return $batchs ?: null;
     }
@@ -98,11 +101,10 @@ class BatchService {
             $batch_set['url'] = $url . $batch_set["id"] ."-".$this->slugHelper->slugify($batch_set["titulo"]);
 
             //Autores
-            $batch_set['autor'] = $this->formatAutorHelper->formatAutor($batch_set["autor"]);
+            $batch_set['autor'] = $this->formatStringHelper->formatAutor($batch_set["autor"]);
 
-
-            //Imagen
-            $batch_set['image'] = "https://martinsarachaga.com/imagenes_lotes/" . $batch_set['id'] . "_1_grande.jpg";
+            //Array para guardar las imágenes
+            $batch_set['images'] = $this->formatImageHelper->ArrayformatImage($batch_set["id"]);
 
             $batches[] = $batch_set;
         }
@@ -111,7 +113,11 @@ class BatchService {
         return $batches ?: [];
     }
 
-
+    /**
+     * Obtiene todos los autores únicos para una subasta dada
+     * @param int $id ID de la subasta
+     * @return array Array de autores con su nombre original y slug
+     */
 
     public function getAuthorsByAuctionId($id)
     {
@@ -123,7 +129,7 @@ class BatchService {
 
         $autores = [];
         while ($row = $result->fetch_assoc()) {
-            $autor = $this->formatAutorHelper->formatAutor($row['autor']);
+            $autor = $this->formatStringHelper->formatAutor($row['autor']);
             $autores[] = [
                 "original" => $autor,
                 "url" => "/" . $this->slugHelper->slugify($autor)
@@ -134,6 +140,12 @@ class BatchService {
         return $autores;
     }
 
+    /**
+     * Obtiene imágenes de lotes por ID de subasta y categorías
+     * @param int $subastaId ID de la subasta
+     * @param array $categorias Array de categorías con sus IDs
+     * @return array Array de categorías con sus imágenes asociadas
+     */
     public function getBatchesImagesByAuctionId($subastaId, $categorias = []) {
         $conn = $this->db->getConnection();
         $resultados = [];
@@ -156,12 +168,10 @@ class BatchService {
             }
             $stmt->close();
 
-            $resultados[] = [
-                "id" => $categoria["id"],
-                "nombre" => $categoria["nombre"],
-                "url" => $categoria["url"],
-                "images" => $images
-            ];
+            $resultados[] = array_merge(
+                $categoria,
+                ["images" => $images]
+            );
         }
 
         return $resultados;
