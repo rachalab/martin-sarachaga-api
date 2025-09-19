@@ -21,7 +21,7 @@ class DateHelper
             IntlDateFormatter::NONE,
             null,
             null,
-            "EEEE, d 'de' MMMM 'de' y"
+            "d 'de' MMMM 'de' y"
         );
 
         $timestamp = strtotime($fecha);

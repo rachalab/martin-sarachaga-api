@@ -40,6 +40,10 @@ class BatchService {
         $batch = new Batch($data);
         $batchs = $batch->toArray();
 
+
+        //Titulo
+        $batchs['titulo'] = $this->formatStringHelper->cleanTitle($batchs["titulo"]);
+
         //Slug y url
         $url = "/subasta-presencial/". $batchs["subasta"] ."/obras/";
         $batchs['slug'] = $batchs["id"] . "-" .$this->slugHelper->slugify($batchs["titulo"]);
@@ -94,9 +98,12 @@ class BatchService {
         $batches = [];
         while ($data = $result->fetch_assoc()) {
             $batch = new Batch($data);
+            $batch_set = $batch->toArray();
+            
+            //Titulo            
+            $batch_set['titulo'] = $this->formatStringHelper->cleanTitle($batch_set["titulo"]);
 
             //Slug y url
-            $batch_set = $batch->toArray();
             $url = "/subasta-presencial/". $batch_set["subasta"] ."/obras/";
             $batch_set['url'] = $url . $batch_set["id"] ."-".$this->slugHelper->slugify($batch_set["titulo"]);
 
