@@ -163,7 +163,7 @@ class BatchService {
                 FROM lotes 
                 WHERE subasta = ? AND categoria = ? 
                 ORDER BY lote ASC 
-                LIMIT 5
+                LIMIT 30
             ");
             $stmt->bind_param("ii", $subastaId, $categoria['id']);
             $stmt->execute();
@@ -171,7 +171,15 @@ class BatchService {
 
             $images = [];
             while ($row = $res->fetch_assoc()) {
-                $images[] = "https://martinsarachaga.com/imagenes_lotes/" . $row['id'] . "_1_grande.jpg";
+                $firstImage = $this->formatImageHelper->getFirstImage($row['id']);
+                
+                if ($firstImage) {
+                    $images[] = $firstImage;
+                }
+
+                if (count($images) >= 5) {
+                    break;
+                }
             }
             $stmt->close();
 
@@ -182,5 +190,38 @@ class BatchService {
         }
 
         return $resultados;
+    }
+
+
+    public function getDirectSaleBatches() {
+        $conn = $this->db->getConnection();
+        $stmt = $conn->prepare("SELECT L.* FROM lotes L INNER JOIN objetos O ON L.mandante = O.mandante AND L.barra = O.id WHERE L.tipo = 'v' AND L.status = 1 AND O.estado NOT IN ('FA','L','D','TR') ORDER BY L.lote");
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        // Fetch results
+        $batches = [];
+        while ($data = $result->fetch_assoc()) {
+            $batch = new Batch($data);
+            $batch_set = $batch->toArray();
+            
+            //Titulo            
+            $batch_set['titulo'] = $this->formatStringHelper->cleanTitle($batch_set["titulo"]);
+
+            //Slug y url
+            $url = "/ventas-online/obras/";
+            $batch_set['url'] = $url . $batch_set["id"] ."-".$this->slugHelper->slugify($batch_set["titulo"]);
+
+            //Autores
+            $batch_set['autor'] = $this->formatStringHelper->formatAutor($batch_set["autor"]);
+
+            //Array para guardar las imágenes
+            $batch_set['images'] = $this->formatImageHelper->ArrayformatImage($batch_set["id"]);
+
+            $batches[] = $batch_set;
+        }
+
+        $stmt->close();
+        return $batches ?: [];
     }
 }

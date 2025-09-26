@@ -33,4 +33,22 @@ class FormatImageHelper
 
         return $batchs;
     }
+
+    /**
+     * Obtiene la URL de la primera imagen de un lote
+     * @param int $id ID del lote
+     * @return string|null URL de la primera imagen o null si no existe
+     */
+
+    public function getFirstImage($id)
+    {
+        $urlImage = "/imagenes_lotes/" . $id . "_1_grande.jpg";
+        $localImagePath = __DIR__ . "/../.." . $urlImage;
+
+        if (file_exists($localImagePath)) {
+            return "https://martinsarachaga.com" . $urlImage;
+        }
+
+        return null;
+    }
 }
