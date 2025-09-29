@@ -11,11 +11,15 @@ class DateHelper
         if (empty($fecha)) {
             return [
                 "system" => null,
-                "format" => null
+                "format" => null,
+                "mobile" => null
             ];
         }
 
-        $formatter = new IntlDateFormatter(
+        $timestamp = strtotime($fecha);
+
+        // Formato completo: "14 de mayo de 2025"
+        $formatterFull = new IntlDateFormatter(
             'es_ES',
             IntlDateFormatter::FULL,
             IntlDateFormatter::NONE,
@@ -23,17 +27,27 @@ class DateHelper
             null,
             "d 'de' MMMM 'de' y"
         );
+        $formatoCompleto = $formatterFull->format($timestamp);
+        $formatoCompleto = mb_convert_case(mb_substr($formatoCompleto, 0, 1, 'UTF-8'), MB_CASE_UPPER, 'UTF-8') .
+                        mb_substr($formatoCompleto, 1, null, 'UTF-8');
 
-        $timestamp = strtotime($fecha);
-        $formateada = $formatter->format($timestamp);
-
-        // Capitaliza la primera letra con soporte UTF-8
-        $formateada = mb_convert_case(mb_substr($formateada, 0, 1, 'UTF-8'), MB_CASE_UPPER, 'UTF-8') .
-                    mb_substr($formateada, 1, null, 'UTF-8');
+        // Formato mobile: "14 de may de 2025"
+        $formatterMobile = new IntlDateFormatter(
+            'es_ES',
+            IntlDateFormatter::FULL,
+            IntlDateFormatter::NONE,
+            null,
+            null,
+            "d 'de' MMM 'de' y"
+        );
+        $formatoMobile = $formatterMobile->format($timestamp);
+        $formatoMobile = mb_convert_case(mb_substr($formatoMobile, 0, 1, 'UTF-8'), MB_CASE_UPPER, 'UTF-8') .
+                        mb_substr($formatoMobile, 1, null, 'UTF-8');
 
         return [
             "system" => $fecha,
-            "format" => $formateada
+            "format" => $formatoCompleto,
+            "mobile" => $formatoMobile
         ];
     }
 }

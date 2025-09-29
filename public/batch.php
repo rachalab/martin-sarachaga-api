@@ -32,17 +32,23 @@ if (empty($lote["lote"]["id"])) {
 }
 
 $subastaId = !empty($lote["lote"]["subasta"]) ? $lote["lote"]["subasta"] : false;
-
+/*
 if (!$subastaId) {
     header("HTTP/1.1 404 Not Found");
     header("Status: 404 Not Found");
 
-    echo json_encode(['error' => 'Subasta no encontrada'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    echo json_encode(['error' => 'Lote no encontrada'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
 
 $auctionService = new AuctionService();
 $lote["subasta"] = $auctionService->getCurrentAuction($subastaId);
+*/
+
+if ($subastaId) {
+    $auctionService = new AuctionService();
+    $lote["subasta"] = $auctionService->getCurrentAuction($subastaId);
+}
 
 //Si tiene noches
 if(!empty($lote["lote"]["nronoche"])){

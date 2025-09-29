@@ -30,4 +30,14 @@
     # Caso con ID -> batch.php
     # -----------------------------
     RewriteRule ^batch/([0-9]+)?$ batch.php?id=$1 [L,QSA]
+
+    # -----------------------------
+    # Caso sin ID -> direct-sale.php sin parámetros
+    # -----------------------------
+    RewriteRule ^direct-sale/?$ direct-sale.php [L,QSA]
+
+    # -----------------------------
+    # Caso con ID + filtros opcionales
+    # -----------------------------
+    RewriteRule ^direct-sale/([0-9]+)(?:/(.*))?$ direct-sale.php?id=$1&params=$2 [L,QSA]
 </IfModule>

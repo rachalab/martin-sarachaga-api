@@ -74,4 +74,17 @@ WHERE lotes.subasta = ?");
         $stmt->close();
         return $categories ?: null;
     }
+
+    public function getCategoryByDirectSale($categorias) {
+        $categories = [];
+        foreach ($categorias as $key => $value) {
+            $category = $this->getCategoryById($value);
+
+            if ($category) {
+                $categories[] = $category;
+            }
+        }
+
+        return $categories ?: null;
+    }
 }

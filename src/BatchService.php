@@ -192,6 +192,10 @@ class BatchService {
         return $resultados;
     }
 
+    /**
+     * Obtiene lotes de venta directa
+     * @return array Array de lotes de venta directa
+     */
 
     public function getDirectSaleBatches() {
         $conn = $this->db->getConnection();

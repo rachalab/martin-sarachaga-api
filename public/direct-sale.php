@@ -1,5 +1,6 @@
 <?php
 require_once '../src/BatchService.php'; // Include the BatchService class
+require_once '../src/CategoryService.php'; // Include the CategoryService class
 header('Content-Type: application/json');
 
 function utf8ize($mixed) {
@@ -12,9 +13,20 @@ function utf8ize($mixed) {
 }
 
 $batchService = new BatchService();
+$venta["lotes"] = $batchService->getDirectSaleBatches();
 
+if(!empty($venta["lotes"])){
 
-$venta = $batchService->getDirectSaleBatches();
+    // Traer solo las categorías
+    $categorias = array_column($venta["lotes"], "categoria");
+
+    // Eliminar duplicados
+    $categoriasUnicas = array_unique($categorias);
+
+    //Trear datos de las categorías
+    $categoriaService = new CategoryService();
+    $venta["categorias"] = $categoriaService->getCategoryByDirectSale($categoriasUnicas);
+}
 
 $data = utf8ize($venta);
 echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
