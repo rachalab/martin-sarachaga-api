@@ -1,6 +1,8 @@
 <?php
 require_once '../src/BatchService.php'; // Include the BatchService class
 require_once '../src/CategoryService.php'; // Include the CategoryService class
+require_once '../src/helpers/FormatStringHelper.php';
+require_once '../src/helpers/SlugHelper.php';
 header('Content-Type: application/json');
 
 function utf8ize($mixed) {
@@ -19,13 +21,34 @@ if(!empty($venta["lotes"])){
 
     // Traer solo las categorías
     $categorias = array_column($venta["lotes"], "categoria");
-
-    // Eliminar duplicados
     $categoriasUnicas = array_unique($categorias);
 
     //Trear datos de las categorías
     $categoriaService = new CategoryService();
     $venta["categorias"] = $categoriaService->getCategoryByDirectSale($categoriasUnicas);
+    
+    
+    $venta["autores"] = [];
+    
+    // Traer solo los autores
+    $autores = array_column($venta["lotes"], "autor");
+    $categoriasUnicas = array_unique($autores);
+    
+    //Si hay autores
+    if(!empty($categoriasUnicas) && is_array($categoriasUnicas)){
+        $formatStringHelper = new FormatStringHelper();
+        $slugHelper = new SlugHelper();
+
+        // Formatear y preparar URLs
+        foreach ($categoriasUnicas as $autor_string) {
+            $autor = $formatStringHelper->formatAutor($autor_string);
+
+            $venta["autores"][] = [
+                "original" => $autor,
+                "url" => "/" . $slugHelper->slugify($autor)
+            ];
+        }
+    }
 }
 
 $data = utf8ize($venta);
