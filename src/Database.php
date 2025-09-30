@@ -3,7 +3,7 @@
 class Database {
     private $connection;
 
-    public function __construct($host = 'localhost', $user = 'root', $password = '', $database = 'saracha') {
+    public function __construct($host = 'localhost', $user = 'root', $password = '', $database = 'sarachaga') {
         $this->connect($host, $user, $password, $database);
     }
 

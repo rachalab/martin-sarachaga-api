@@ -12,7 +12,7 @@ class DateHelper
             return [
                 "system" => null,
                 "format" => null,
-                "mobile" => null
+                "short" => null
             ];
         }
 
@@ -47,7 +47,7 @@ class DateHelper
         return [
             "system" => $fecha,
             "format" => $formatoCompleto,
-            "mobile" => $formatoMobile
+            "short" => $formatoMobile
         ];
     }
 }
