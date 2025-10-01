@@ -53,7 +53,7 @@ class BatchService {
         $batchs['autor'] = $this->formatStringHelper->formatAutor($batchs["autor"]);
 
         //Array para guardar las imágenes
-        $batchs['images'] = $this->formatImageHelper->ArrayformatImage($batchs["id"]);
+        $batchs['images'] = $this->formatImageHelper->ArrayformatImage($batchs["id"], true);
  
         // Convierte el objeto a array
         return $batchs ?: null;
@@ -220,7 +220,7 @@ class BatchService {
             $batch_set['autor'] = $this->formatStringHelper->formatAutor($batch_set["autor"]);
 
             //Array para guardar las imágenes
-            $batch_set['images'] = $this->formatImageHelper->ArrayformatImage($batch_set["id"]);
+            $batch_set['images'] = $this->formatImageHelper->ArrayformatImage($batch_set["id"], true);
 
             $batches[] = $batch_set;
         }
@@ -228,4 +228,63 @@ class BatchService {
         $stmt->close();
         return $batches ?: [];
     }
+
+    /**
+     * Verifica si un lote corresponde a una venta directa y lo devuelve
+     * @param int $id ID del objeto/lote
+     * @return array|null Datos del lote si es venta directa, o null en caso contrario
+     */
+    public function getDirectSaleBathById($id) {
+        $conn = $this->db->getConnection();
+
+        // Mismo query que en getDirectSaleObjects, pero filtrado por ID
+        $stmt = $conn->prepare("
+            SELECT L.* 
+            FROM lotes L 
+            INNER JOIN objetos O 
+                ON L.mandante = O.mandante 
+                AND L.barra = O.id 
+            WHERE L.tipo = 'v' 
+            AND L.status = 1 
+            AND O.estado NOT IN ('FA','L','D','TR') 
+            AND L.id = ?
+            LIMIT 1
+        ");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $data = $result->fetch_assoc();
+        $stmt->close();
+
+        if (!$data) {
+            return null; // No cumple condiciones de venta directa
+        }
+
+        // Crear objeto Batch y formatear igual que en getDirectSaleObjects
+        $batch = new Batch($data);
+        $batch_set = $batch->toArray();
+
+        // Título
+        $batch_set['titulo'] = $this->formatStringHelper->cleanTitle($batch_set["titulo"]);
+
+        // Slug y URL (ruta de ventas online, no de subasta)
+        $url = "/ventas-online/obras/";
+        $batch_set['url'] = $url . $batch_set["id"] . "-" . $this->slugHelper->slugify($batch_set["titulo"]);
+
+        // Autores
+        $batch_set['autor'] = $this->formatStringHelper->formatAutor($batch_set["autor"]);
+
+        // Imágenes
+        $batch_set['images'] = $this->formatImageHelper->ArrayformatImage($batch_set["id"], true);
+
+        return $batch_set ?: null;
+    }
+
+
+
+
+
+
+
+
 }

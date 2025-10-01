@@ -15,23 +15,18 @@ function utf8ize($mixed) {
 }
 
 $batchService = new BatchService();
-$venta["lotes"] = $batchService->getDirectSaleBatches();
+$lotes["lotes"] = $batchService->getDirectSaleBatches();
 
-if(!empty($venta["lotes"])){
-
-    // Traer solo las categorías
-    $categorias = array_column($venta["lotes"], "categoria");
-    $categoriasUnicas = array_unique($categorias);
-
-    //Trear datos de las categorías
+if(!empty($lotes["lotes"])){
+    //Trear datos de las categorías con los lotes
     $categoriaService = new CategoryService();
-    $venta["categorias"] = $categoriaService->getCategoryByDirectSale($categoriasUnicas);
+    $venta["categorias"] = $categoriaService->getCategoryByDirectSale($lotes["lotes"]);
     
     
     $venta["autores"] = [];
     
     // Traer solo los autores
-    $autores = array_column($venta["lotes"], "autor");
+    $autores = array_column($lotes["lotes"], "autor");
     $categoriasUnicas = array_unique($autores);
     
     //Si hay autores

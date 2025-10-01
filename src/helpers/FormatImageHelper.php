@@ -6,9 +6,8 @@ class FormatImageHelper
      * @param int $id ID del lote
      * @return array|null Array con las URLs de las imágenes o null si no hay imágenes
      */
-    public function ArrayformatImage($id)
-    {
-        //Array para guardar las imágenes
+    public function ArrayformatImage($id, $dimensions = false) {
+        //Array para guardar las imágenes        
         $batchs = [];
         $imageCounter = 1;
 
@@ -17,21 +16,37 @@ class FormatImageHelper
             $localImagePath = __DIR__ . "/../.." . $urlImage;
             
             if (file_exists($localImagePath)) {
-                // Si la imagen existe, agrega la URL al array
-                $batchs[] = "https://martinsarachaga.com" . $urlImage;
+                // Obtener dimensiones reales
+                $imageSize = getimagesize($localImagePath);
+
+                //Si se piden dimensiones
+                if($dimensions === true){
+                    if ($imageSize) {
+                        $width = $imageSize[0];
+                        $height = $imageSize[1];
+                    } else {
+                        $width = null;
+                        $height = null;
+                    }
+                    
+                    // Agregar al array con src + dimensiones
+                    $batchs[] = [
+                        'src' => "https://martinsarachaga.com" . $urlImage,
+                        'width' => $width,
+                        'height' => $height
+                    ];
+                }else{
+                    // Agregar al array solo con src
+                    $batchs[] = "https://martinsarachaga.com" . $urlImage;
+                }
+                
                 $imageCounter++;
             } else {
-                // Si la imagen no existe, sal del bucle
                 break;
             }
         }
         
-        // Si no se encontró ninguna imagen, puedes asignar un valor por defecto
-        if (empty($batchs)) {
-            $batchs = null; // O una URL a una imagen por defecto
-        }
-
-        return $batchs;
+        return empty($batchs) ? null : $batchs;
     }
 
     /**
@@ -40,8 +55,7 @@ class FormatImageHelper
      * @return string|null URL de la primera imagen o null si no existe
      */
 
-    public function getFirstImage($id)
-    {
+    public function getFirstImage($id){
         $urlImage = "/imagenes_lotes/" . $id . "_1_grande.jpg";
         $localImagePath = __DIR__ . "/../.." . $urlImage;
 

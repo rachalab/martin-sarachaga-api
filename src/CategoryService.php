@@ -75,10 +75,26 @@ WHERE lotes.subasta = ?");
         return $categories ?: null;
     }
 
-    public function getCategoryByDirectSale($categorias) {
+    /**
+     * Obtiene todas las categorías de lotes en venta directa
+     * @param array $ventas Array de lotes en venta directa
+     * @return Category[]|null Lista de categorías o null si no existen
+     */
+    public function getCategoryByDirectSale($ventas) {
+        // Traer solo las categorías
+        $categorias = array_column($ventas, "categoria");
+        $categoriasUnicas = array_unique($categorias);
+
         $categories = [];
-        foreach ($categorias as $key => $value) {
+        foreach ($categoriasUnicas as $key => $value) {
             $category = $this->getCategoryById($value);
+
+
+            foreach($ventas as $venta){
+                if($venta["categoria"] == $value){
+                    $category["lotes"][] = $venta;
+                }
+            }
 
             if ($category) {
                 $categories[] = $category;

@@ -38,7 +38,7 @@ class DateHelper
             IntlDateFormatter::NONE,
             null,
             null,
-            "d 'de' MMM 'de' y"
+            "d MMM y"
         );
         $formatoMobile = $formatterMobile->format($timestamp);
         $formatoMobile = mb_convert_case(mb_substr($formatoMobile, 0, 1, 'UTF-8'), MB_CASE_UPPER, 'UTF-8') .
