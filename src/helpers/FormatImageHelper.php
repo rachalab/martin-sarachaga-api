@@ -13,7 +13,7 @@ class FormatImageHelper
 
         while (true) {
             $urlImage = "/imagenes_lotes/" . $id . "_" . $imageCounter . "_grande.jpg";
-            $localImagePath = __DIR__ . "/../.." . $urlImage;
+            $localImagePath = __DIR__ . "/../../.." . $urlImage;
             
             if (file_exists($localImagePath)) {
                 // Obtener dimensiones reales
@@ -57,7 +57,7 @@ class FormatImageHelper
 
     public function getFirstImage($id){
         $urlImage = "/imagenes_lotes/" . $id . "_1_grande.jpg";
-        $localImagePath = __DIR__ . "/../.." . $urlImage;
+        $localImagePath = __DIR__ . "/../../.." . $urlImage;
 
         if (file_exists($localImagePath)) {
             return "https://martinsarachaga.com" . $urlImage;

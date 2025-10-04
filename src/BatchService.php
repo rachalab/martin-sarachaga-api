@@ -17,6 +17,8 @@ class BatchService {
         $this->formatStringHelper = new FormatStringHelper();
         $this->formatImageHelper = new FormatImageHelper();
     }
+    
+    
 
     /**
      * Obtiene un lote por su ID
@@ -142,6 +144,8 @@ class BatchService {
                 "url" => "/" . $this->slugHelper->slugify($autor)
             ];
         }
+
+
 
         $stmt->close();
         return $autores;
