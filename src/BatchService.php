@@ -217,7 +217,7 @@ class BatchService {
             $batch_set['titulo'] = $this->formatStringHelper->cleanTitle($batch_set["titulo"]);
 
             //Slug y url
-            $url = "/ventas-privada/";
+            $url = "/venta-privada/";
             $batch_set['url'] = $url . $batch_set["id"] ."-".$this->slugHelper->slugify($batch_set["titulo"]);
 
             //Autores
@@ -272,7 +272,7 @@ class BatchService {
         $batch_set['titulo'] = $this->formatStringHelper->cleanTitle($batch_set["titulo"]);
 
         // Slug y URL (ruta de ventas online, no de subasta)
-        $url = "/ventas-privada/";
+        $url = "/venta-privada/";
         $batch_set['url'] = $url . $batch_set["id"] . "-" . $this->slugHelper->slugify($batch_set["titulo"]);
 
         // Autores
