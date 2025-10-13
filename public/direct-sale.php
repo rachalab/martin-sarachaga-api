@@ -14,6 +14,30 @@ function utf8ize($mixed) {
     return $mixed;
 }
 
+//Convierte params de Htaccess a variables
+if (isset($_GET['params'])) {
+    $parts = explode('/', $_GET['params']);
+    for ($i = 0; $i < count($parts); $i += 2) {
+        if (isset($parts[$i+1])) {
+            $_GET[$parts[$i]] = urldecode($parts[$i+1]);
+        }
+    }
+}
+
+//Metadata
+$meta = isset($_GET['meta']) ? $_GET['meta'] : false;
+
+
+//Si se pide solo metadatos - Titulos | Descripcion
+if($meta == "metadata"){
+    $data["title"] = 'Venta privada';
+    $data["description"] = 'Descripcion de privada';
+
+    $data = utf8ize($data);
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    exit;
+}
+
 $batchService = new BatchService();
 $lotes["lotes"] = $batchService->getDirectSaleBatches();
 

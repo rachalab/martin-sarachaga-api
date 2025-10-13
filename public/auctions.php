@@ -48,6 +48,9 @@ $autor = isset($_GET['autor']) ? $_GET['autor'] : false;
 $categoria = isset($_GET['categoria']) ? $_GET['categoria'] : false;
 $noche = isset($_GET['noche']) ? $_GET['noche'] : false;
 
+
+$meta = isset($_GET['meta']) ? $_GET['meta'] : false;
+
 //Traemos La subasta
 $subasta["subasta"] = $auctionService->getCurrentAuction($id);
 
@@ -61,6 +64,22 @@ if (!$subastId) {
     echo json_encode(['error' => 'Subasta no encontrada'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
+
+
+//Si se pide solo metadatos - Titulos | Descripcion
+if($meta == "metadata"){
+    $data["title"] = !empty($subasta['subasta']['nro']) ? 
+        'Subasta Nro ' . $subasta['subasta']['nro'] : 
+            false;
+    $data["description"] = !empty($subasta["subasta"]["descripcion"]) ? 
+        $subasta["subasta"]["descripcion"] : 
+        'Subasta presencial Nro ' . strval($subasta['subasta']['nro']);
+
+    $data = utf8ize($data);
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    exit;
+}
+
 
 //Treamos las noches
 $NightService = new NightService();

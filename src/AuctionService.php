@@ -28,32 +28,7 @@ class AuctionService {
             $result = $stmt->get_result();
             $data = $result->fetch_assoc();
             $stmt->close();
-        } else {
-            $stmt = $conn->prepare("SELECT * FROM subastas WHERE status = 1 AND subasta_online = 0 AND fechainicio <= CURDATE() AND fechafin >= CURDATE() LIMIT 1");
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $data = $result->fetch_assoc();
-            $stmt->close();
-        }
-
-        // Si no hay subasta actual, buscar la próxima a realizar
-        if (!$data) {
-            $stmt = $conn->prepare("SELECT * FROM subastas WHERE status = 1 AND subasta_online = 0 AND fechainicio > CURDATE() ORDER BY fechainicio ASC LIMIT 1");
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $data = $result->fetch_assoc();
-            $stmt->close();
-        }
-
-        //La ultima finalizada  
-        if (!$data) {
-            $stmt = $conn->prepare("SELECT * FROM subastas WHERE status = 1 AND subasta_online = 0 AND fechainicio < CURDATE() ORDER BY fechainicio DESC LIMIT 1");
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $data = $result->fetch_assoc();
-            $stmt->close();
-        }
-
+        } 
 
         if (!$data) {
             return null;

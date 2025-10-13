@@ -37,10 +37,10 @@
     RewriteRule ^direct-sale/?$ direct-sale.php [L,QSA]
     
     # -----------------------------
-    # Caso con ID + filtros opcionales
+    # Caso con filtros opcionales
     # -----------------------------
-    RewriteRule ^direct-sale/([0-9]+)(?:/(.*))?$ direct-sale.php?id=$1&params=$2 [L,QSA]
-   
+    RewriteRule ^direct-sale(?:/(.*))?$ direct-sale.php?params=$1 [L,QSA]
+  
     # -----------------------------
     # Caso con ID -> object.php
     # -----------------------------
