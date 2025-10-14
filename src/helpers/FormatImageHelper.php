@@ -50,17 +50,36 @@ class FormatImageHelper
     }
 
     /**
-     * Obtiene la URL de la primera imagen de un lote
+     * Obtiene la URL de la primera imagen de un lote, con opción de incluir dimensiones
      * @param int $id ID del lote
-     * @return string|null URL de la primera imagen o null si no existe
+     * @param bool $dimensions Si es true, devuelve también ancho y alto
+     * @return array|string|null URL o array con src, width, height; null si no existe
      */
-
-    public function getFirstImage($id){
+    public function getFirstImage($id, $dimensions = false) {
         $urlImage = "/imagenes_lotes/" . $id . "_1_grande.jpg";
         $localImagePath = __DIR__ . "/../../.." . $urlImage;
 
         if (file_exists($localImagePath)) {
-            return "https://martinsarachaga.com" . $urlImage;
+            $fullUrl = "https://martinsarachaga.com" . $urlImage;
+
+            if ($dimensions === true) {
+                $imageSize = getimagesize($localImagePath);
+                if ($imageSize) {
+                    $width = $imageSize[0];
+                    $height = $imageSize[1];
+                } else {
+                    $width = null;
+                    $height = null;
+                }
+
+                return [
+                    'src' => $fullUrl,
+                    'width' => $width,
+                    'height' => $height
+                ];
+            }
+
+            return $fullUrl;
         }
 
         return null;

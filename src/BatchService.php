@@ -113,7 +113,7 @@ class BatchService {
             $batch_set['autor'] = $this->formatStringHelper->formatAutor($batch_set["autor"]);
 
             //Array para guardar las imágenes
-            $batch_set['images'] = $this->formatImageHelper->ArrayformatImage($batch_set["id"], true);
+            $batch_set['images'] = $this->formatImageHelper->getFirstImage($batch_set["id"], true);
 
             $batches[] = $batch_set;
         }
@@ -224,7 +224,7 @@ class BatchService {
             $batch_set['autor'] = $this->formatStringHelper->formatAutor($batch_set["autor"]);
 
             //Array para guardar las imágenes
-            $batch_set['images'] = $this->formatImageHelper->ArrayformatImage($batch_set["id"], true);
+            $batch_set['images'] = $this->formatImageHelper->getFirstImage($batch_set["id"], true);
 
             $batches[] = $batch_set;
         }
