@@ -30,8 +30,13 @@ $meta = isset($_GET['meta']) ? $_GET['meta'] : false;
 
 //Si se pide solo metadatos - Titulos | Descripcion
 if($meta == "metadata"){
-    $data["title"] = 'Venta privada';
-    $data["description"] = 'Descripcion de privada';
+    $data["title"] = 'Venta privada — Martín Saráchaga Subastas';
+    $data["description"] = 'Venta privada de obras de arte en Buenos Aires, Argentina.';
+    $data["url"] = '/venta-privada';
+
+    $data["image"]["src"] = '/assets/images/sarachaga_meta_thumb.jpg';
+    $data["image"]["width"] = 1200;
+    $data["image"]["height"] = 600;
 
     $data = utf8ize($data);
     echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);

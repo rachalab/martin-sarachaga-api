@@ -69,11 +69,17 @@ if (!$subastId) {
 //Si se pide solo metadatos - Titulos | Descripcion
 if($meta == "metadata"){
     $data["title"] = !empty($subasta['subasta']['nro']) ? 
-        'Subasta Nro ' . $subasta['subasta']['nro'] : 
-            false;
+        'Subasta Nro ' . $subasta['subasta']['nro'] .' — `Martín Saráchaga Subastas`' : 
+            'Subasta — Martín Saráchaga Subastas';
     $data["description"] = !empty($subasta["subasta"]["descripcion"]) ? 
         $subasta["subasta"]["descripcion"] : 
         'Subasta presencial Nro ' . strval($subasta['subasta']['nro']);
+
+    $data["url"] = !empty($subasta["subasta"]["url"]) ? $subasta["subasta"]["url"]. "/obras" : "";
+
+    $data["image"]["src"] = '/assets/images/sarachaga_meta_thumb.jpg';
+    $data["image"]["width"] = 1200;
+    $data["image"]["height"] = 600;
 
     $data = utf8ize($data);
     echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);

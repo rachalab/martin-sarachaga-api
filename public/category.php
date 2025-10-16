@@ -15,9 +15,6 @@ require_once '../src/BatchService.php'; // Include the BatchService class
 
 header('Content-Type: application/json');
 
-$autor = isset($_REQUEST['autor']) ? $_REQUEST['autor'] : false;
-$categoria = isset($_REQUEST['categoria']) ? $_REQUEST['categoria'] : false;
-$noche = isset($_REQUEST['noche']) ? $_REQUEST['noche'] : false;
 $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : false;
 
 $auctionService = new AuctionService();
@@ -33,13 +30,28 @@ if (!$subastId) {
     exit;
 }
 
+//Metadata
+$subasta["meta"]["title"] = !empty($subasta['subasta']['nro']) ? 
+    'Subasta Nro ' . $subasta['subasta']['nro'] .' — Categorias — Martín Saráchaga Subastas' : 
+    'Categorias — Martín Saráchaga Subastas';
+
+$subasta["meta"]["description"] = !empty($subasta["subasta"]["descripcion"]) ? 
+    $subasta["subasta"]["descripcion"] : 
+    'Categorias de subasta presencial Nro ' . strval($subasta['subasta']['nro']);
+
+$subasta["meta"]["url"] = !empty($subasta["subasta"]["url"]) ? $subasta["subasta"]["url"] : "";
+
+$subasta["meta"]["image"]["src"] = '/assets/images/sarachaga_meta_thumb.jpg';
+$subasta["meta"]["image"]["width"] = 1200;
+$subasta["meta"]["image"]["height"] = 600;
+
+//Noches
 $NightService = new NightService();
 $subasta["noches"] = $NightService->getNights($subastId);
 
+//Categoria
 $CategoryService = new CategoryService();
 $Category = $CategoryService->getCategoryByAuctionId($subastId);
-
-
 
 //Si tiene categorias
 if(!empty($Category)){
