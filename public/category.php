@@ -41,10 +41,6 @@ $subasta["meta"]["description"] = !empty($subasta["subasta"]["descripcion"]) ?
 
 $subasta["meta"]["url"] = !empty($subasta["subasta"]["url"]) ? $subasta["subasta"]["url"] : "";
 
-$subasta["meta"]["image"]["src"] = '/assets/images/sarachaga_meta_thumb.jpg';
-$subasta["meta"]["image"]["width"] = 1200;
-$subasta["meta"]["image"]["height"] = 600;
-
 //Noches
 $NightService = new NightService();
 $subasta["noches"] = $NightService->getNights($subastId);
@@ -61,11 +57,32 @@ if(!empty($Category)){
     $subasta["categorias"] = null;
 }
 
+/**
+ * Convierte recursivamente cualquier codificación a UTF-8
+ */
 function utf8ize($mixed) {
     if (is_array($mixed)) {
         return array_map('utf8ize', $mixed);
     } elseif (is_string($mixed)) {
-        return mb_convert_encoding($mixed, 'UTF-8', 'UTF-8');
+        // Si ya es UTF-8 válido, lo devuelve tal cual
+        if (mb_check_encoding($mixed, 'UTF-8')) {
+            return $mixed;
+        }
+        
+        // Intenta detectar la codificación
+        $encoding = mb_detect_encoding(
+            $mixed, 
+            ['UTF-8', 'ISO-8859-1', 'Windows-1252', 'ASCII'], 
+            true
+        );
+        
+        // Si detectó algo, convierte a UTF-8
+        if ($encoding && $encoding !== 'UTF-8') {
+            return mb_convert_encoding($mixed, 'UTF-8', $encoding);
+        }
+        
+        // Fallback: asume ISO-8859-1 (Latin1) que es común en bases de datos antiguas
+        return mb_convert_encoding($mixed, 'UTF-8', 'ISO-8859-1');
     }
     return $mixed;
 }
