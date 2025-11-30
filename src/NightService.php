@@ -40,7 +40,7 @@ class NightService {
 
                 $nights[count($nights) - 1]['horario'] = [
                 "system" => $night->horario,
-                "format" => str_replace('.', ':', $night->horario)
+                "format" => str_replace('.', ':', $night->horario),
                 ];
             }
         }

@@ -2,14 +2,17 @@
 require_once 'Database.php';
 require_once 'models/Category.php'; // Include the Category model
 require_once 'helpers/SlugHelper.php'; // Include any helper functions if needed
+require_once 'helpers/FormatStringHelper.php';
 
 class CategoryService {
     private $db;
     private $slugHelper;    
+    private $formatStringHelper;
 
     public function __construct() {
         $this->db = new Database();
-        $this->slugHelper = new SlugHelper(); // Assuming you have a SlugHelper class for Slug String        
+        $this->slugHelper = new SlugHelper(); // Assuming you have a SlugHelper class for Slug String     
+        $this->formatStringHelper = new FormatStringHelper();           
     }
 
     /**
@@ -28,6 +31,10 @@ class CategoryService {
         $categories = $result->fetch_assoc();
         $stmt->close();
 
+        $categories = new Category($categories);
+        $categories = $categories->toArray();
+
+        $categories["nombre"] = $this->formatStringHelper->formatCategoria($categories["nombre"]);
 
         $categories["url"] = "/". $this->slugHelper->slugify($categories["nombre"]); 
 
@@ -58,11 +65,42 @@ WHERE lotes.subasta = ?");
             $categori = [];
             $categori = $category->toArray();
 
+            $categori["nombre"] = $this->formatStringHelper->formatCategoria($categori["nombre"]); 
+
             $categori["url"] = "/". $this->slugHelper->slugify($categori["nombre"]); 
 
             $categories[] = $categori;
         }
         $stmt->close();
+        return $categories ?: null;
+    }
+
+    /**
+     * Obtiene todas las categorías de lotes en venta directa
+     * @param array $ventas Array de lotes en venta directa
+     * @return Category[]|null Lista de categorías o null si no existen
+     */
+    public function getCategoryByDirectSale($ventas) {
+        // Traer solo las categorías
+        $categorias = array_column($ventas, "categoria");
+        $categoriasUnicas = array_unique($categorias);
+
+        $categories = [];
+        foreach ($categoriasUnicas as $key => $value) {
+            $category = $this->getCategoryById($value);
+
+
+            foreach($ventas as $venta){
+                if($venta["categoria"] == $value){
+                    $category["lotes"][] = $venta;
+                }
+            }
+
+            if ($category) {
+                $categories[] = $category;
+            }
+        }
+
         return $categories ?: null;
     }
 }

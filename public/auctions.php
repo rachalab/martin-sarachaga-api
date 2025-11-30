@@ -6,11 +6,32 @@ require_once '../src/BatchService.php'; // Include the BatchService class
 
 header('Content-Type: application/json');
 
+/**
+ * Convierte recursivamente cualquier codificación a UTF-8
+ */
 function utf8ize($mixed) {
     if (is_array($mixed)) {
         return array_map('utf8ize', $mixed);
     } elseif (is_string($mixed)) {
-        return mb_convert_encoding($mixed, 'UTF-8', 'UTF-8');
+        // Si ya es UTF-8 válido, lo devuelve tal cual
+        if (mb_check_encoding($mixed, 'UTF-8')) {
+            return $mixed;
+        }
+        
+        // Intenta detectar la codificación
+        $encoding = mb_detect_encoding(
+            $mixed, 
+            ['UTF-8', 'ISO-8859-1', 'Windows-1252', 'ASCII'], 
+            true
+        );
+        
+        // Si detectó algo, convierte a UTF-8
+        if ($encoding && $encoding !== 'UTF-8') {
+            return mb_convert_encoding($mixed, 'UTF-8', $encoding);
+        }
+        
+        // Fallback: asume ISO-8859-1 (Latin1) que es común en bases de datos antiguas
+        return mb_convert_encoding($mixed, 'UTF-8', 'ISO-8859-1');
     }
     return $mixed;
 }
@@ -48,6 +69,9 @@ $autor = isset($_GET['autor']) ? $_GET['autor'] : false;
 $categoria = isset($_GET['categoria']) ? $_GET['categoria'] : false;
 $noche = isset($_GET['noche']) ? $_GET['noche'] : false;
 
+
+$meta = isset($_GET['meta']) ? $_GET['meta'] : false;
+
 //Traemos La subasta
 $subasta["subasta"] = $auctionService->getCurrentAuction($id);
 
@@ -55,9 +79,30 @@ $subastId = !empty($subasta["subasta"]["id"]) ? $subasta["subasta"]["id"] : fals
 
 //Si no existe el ID devolvemos un mensaje de error
 if (!$subastId) {
+    header("HTTP/1.1 404 Not Found");
+    header("Status: 404 Not Found");
+
     echo json_encode(['error' => 'Subasta no encontrada'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
+
+
+//Si se pide solo metadatos - Titulos | Descripcion
+if($meta == "metadata"){
+    $data["title"] = !empty($subasta['subasta']['nro']) ? 
+        'Subasta Nro ' . $subasta['subasta']['nro'] .' — `Martín Saráchaga Subastas`' : 
+            'Subasta — Martín Saráchaga Subastas';
+    $data["description"] = !empty($subasta["subasta"]["descripcion"]) ? 
+        $subasta["subasta"]["descripcion"] : 
+        'Subasta presencial Nro ' . strval($subasta['subasta']['nro']);
+
+    $data["url"] = !empty($subasta["subasta"]["url"]) ? $subasta["subasta"]["url"]. "/obras" : "";
+
+    $data = utf8ize($data);
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    exit;
+}
+
 
 //Treamos las noches
 $NightService = new NightService();

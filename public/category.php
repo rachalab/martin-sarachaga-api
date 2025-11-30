@@ -15,9 +15,6 @@ require_once '../src/BatchService.php'; // Include the BatchService class
 
 header('Content-Type: application/json');
 
-$autor = isset($_REQUEST['autor']) ? $_REQUEST['autor'] : false;
-$categoria = isset($_REQUEST['categoria']) ? $_REQUEST['categoria'] : false;
-$noche = isset($_REQUEST['noche']) ? $_REQUEST['noche'] : false;
 $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : false;
 
 $auctionService = new AuctionService();
@@ -26,17 +23,31 @@ $subastId = !empty($subasta["subasta"]["id"]) ? $subasta["subasta"]["id"] : fals
 
 //Si no existe el ID devolvemos un mensaje de error
 if (!$subastId) {
+    header("HTTP/1.1 404 Not Found");
+    header("Status: 404 Not Found");
+
     echo json_encode(['error' => 'Subasta no encontrada'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
 
+//Metadata
+$subasta["meta"]["title"] = !empty($subasta['subasta']['nro']) ? 
+    'Subasta Nro ' . $subasta['subasta']['nro'] .' — Categorias — Martín Saráchaga Subastas' : 
+    'Categorias — Martín Saráchaga Subastas';
+
+$subasta["meta"]["description"] = !empty($subasta["subasta"]["descripcion"]) ? 
+    $subasta["subasta"]["descripcion"] : 
+    'Categorias de subasta presencial Nro ' . strval($subasta['subasta']['nro']);
+
+$subasta["meta"]["url"] = !empty($subasta["subasta"]["url"]) ? $subasta["subasta"]["url"] : "";
+
+//Noches
 $NightService = new NightService();
 $subasta["noches"] = $NightService->getNights($subastId);
 
+//Categoria
 $CategoryService = new CategoryService();
 $Category = $CategoryService->getCategoryByAuctionId($subastId);
-
-
 
 //Si tiene categorias
 if(!empty($Category)){
@@ -46,24 +57,37 @@ if(!empty($Category)){
     $subasta["categorias"] = null;
 }
 
-
-
+/**
+ * Convierte recursivamente cualquier codificación a UTF-8
+ */
 function utf8ize($mixed) {
     if (is_array($mixed)) {
         return array_map('utf8ize', $mixed);
     } elseif (is_string($mixed)) {
-        return mb_convert_encoding($mixed, 'UTF-8', 'UTF-8');
+        // Si ya es UTF-8 válido, lo devuelve tal cual
+        if (mb_check_encoding($mixed, 'UTF-8')) {
+            return $mixed;
+        }
+        
+        // Intenta detectar la codificación
+        $encoding = mb_detect_encoding(
+            $mixed, 
+            ['UTF-8', 'ISO-8859-1', 'Windows-1252', 'ASCII'], 
+            true
+        );
+        
+        // Si detectó algo, convierte a UTF-8
+        if ($encoding && $encoding !== 'UTF-8') {
+            return mb_convert_encoding($mixed, 'UTF-8', $encoding);
+        }
+        
+        // Fallback: asume ISO-8859-1 (Latin1) que es común en bases de datos antiguas
+        return mb_convert_encoding($mixed, 'UTF-8', 'ISO-8859-1');
     }
     return $mixed;
 }
 
 $data = utf8ize($subasta);
-
-$json= json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-if ($json === false) {
-    echo "Error en json_encode: " . json_last_error_msg();
-}else{
-    print $json;
-}
+echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
 ?>
